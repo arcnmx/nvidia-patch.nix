@@ -10,11 +10,14 @@
   };
   outputs = { self, flakelib, nixpkgs, nvidia-patch-src, ... }@inputs: let
     nixlib = nixpkgs.lib;
+    mapLinuxPackages = packages: {
+      inherit (packages) nvidia-patch nvidiaPatchPackages;
+    };
   in flakelib {
     inherit inputs;
     systems = [ "x86_64-linux" ];
     packages = {
-      nvidia-patch = { outputs'legacyPackages'pkgs }: outputs'legacyPackages'pkgs.linuxPackages.nvidia-patch;
+      nvidia-patch = { outputs'legacyPackages'linuxPackages }: outputs'legacyPackages'linuxPackages.nvidia-patch;
       default = { nvidia-patch }: nvidia-patch;
     };
     legacyPackages = { callPackageSet }: callPackageSet {
@@ -27,11 +30,17 @@
           self.overlays.default
         ];
       };
-      linuxKernelPackages = { outputs'legacyPackages'pkgs }: nixlib.mapAttrs (_: packages: {
-        inherit (packages) nvidia-patch;
-      }) outputs'legacyPackages'pkgs.linuxKernel.packages;
+      linuxKernelPackages = { outputs'legacyPackages'pkgs }: nixlib.mapAttrs (_: mapLinuxPackages) outputs'legacyPackages'pkgs.linuxKernel.packages;
+      linuxPackages = { outputs'legacyPackages'pkgs }: mapLinuxPackages outputs'legacyPackages'pkgs.linuxPackages;
+      linuxPackages_latest = { outputs'legacyPackages'pkgs }: mapLinuxPackages outputs'legacyPackages'pkgs.linuxPackages_latest;
       nvidia-patch-drivers = { outputs'legacyPackages'pkgs }: outputs'legacyPackages'pkgs.nvidia-patch-drivers;
     } { };
+    checks = {
+      supported = { checkAssert, nvidia-patch }: checkAssert {
+        name = "${nvidia-patch.version}-support";
+        cond = !nvidia-patch.meta.broken;
+      };
+    };
     lib = with nixlib; let
       manifestPath = nvidia-patch-src + "/drivers.json";
       manifest = importJSON (manifestPath);
@@ -85,11 +94,10 @@
             nvidia-patch = kfinal.callPackage ./derivation.nix {
               inherit nvidia-patch-src;
               inherit (final) nvidia-patch-drivers;
-              nvidia_x11 = kprev.nvidiaPackages.latest;
             };
-            nvidiaPackages = nixlib.mapAttrs (_: nvidia_x11: kfinal.nvidia-patch.override {
+            nvidia-patches = nixlib.mapAttrs (_: nvidia_x11: kfinal.nvidia-patch.override {
               inherit nvidia_x11;
-            }) kprev.nvidiaPackages;
+            }) kfinal.nvidiaPackages;
           });
         };
       };
