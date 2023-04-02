@@ -11,7 +11,7 @@
   outputs = { self, flakelib, nixpkgs, nvidia-patch-src, ... }@inputs: let
     nixlib = nixpkgs.lib;
     mapLinuxPackages = packages: {
-      inherit (packages) nvidia-patch nvidiaPatchPackages;
+      inherit (packages) nvidia-patch nvidia-patches nvidiaPackages;
     };
   in flakelib {
     inherit inputs;
@@ -36,10 +36,12 @@
       nvidia-patch-drivers = { outputs'legacyPackages'pkgs }: outputs'legacyPackages'pkgs.nvidia-patch-drivers;
     } { };
     checks = {
-      supported = { checkAssert, nvidia-patch }: checkAssert {
-        name = "${nvidia-patch.version}-support";
-        cond = !nvidia-patch.meta.broken;
-      };
+      supported = { runCommand, nvidia-patch }: runCommand "${nvidia-patch.version}-support" {
+        meta.broken = !nvidia-patch.meta.available;
+        nvidia_x11 = builtins.unsafeDiscardStringContext nvidia-patch.outPath;
+      } ''
+        touch $out
+      '';
     };
     lib = with nixlib; let
       manifestPath = nvidia-patch-src + "/drivers.json";
