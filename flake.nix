@@ -45,6 +45,7 @@
       manifestPath = nvidia-patch-src + "/drivers.json";
       manifest = importJSON (manifestPath);
     in {
+      src = nvidia-patch-src;
       manifest = manifest // {
         outPath = manifestPath;
         data = manifest;
@@ -81,6 +82,11 @@
       in mapAttrs (platform: latest) {
         inherit (self.lib.drivers) linux win;
       };
+      driversFor = { hostPlatform }: let
+        driversOs = if hostPlatform.isLinux then "linux"
+          else if hostPlatform.isWindows then "win"
+          else throw "unsupported nvidia-patch os ${hostPlatform.system}";
+      in self.lib.drivers.${driversOs}.${hostPlatform.linuxArch};
     };
     overlays = {
       nvidia-patch = final: prev: {
@@ -88,20 +94,36 @@
           driversOs = if final.hostPlatform.isLinux then "linux"
             else if final.hostPlatform.isWindows then "win"
             else throw "unsupported nvidia-patch os ${final.hostPlatform.system}";
-        in self.lib.drivers.${driversOs}.${final.hostPlatform.linuxArch};
+        in self.lib.driversFor { inherit (final) hostPlatform; };
         linuxKernel = prev.linuxKernel // {
-          packagesFor = kernel: (prev.linuxKernel.packagesFor kernel).extend (kfinal: kprev: {
-            nvidia-patch = kfinal.callPackage ./derivation.nix {
+          packagesFor = kernel: (prev.linuxKernel.packagesFor kernel).extend (kfinal: kprev: let
+            callPackage = args: kfinal.callPackage ./derivation.nix ({
               inherit nvidia-patch-src;
               inherit (final) nvidia-patch-drivers;
-            };
-            nvidia-patches = nixlib.mapAttrs (_: nvidia_x11: kfinal.nvidia-patch.override {
-              inherit nvidia_x11;
-            }) kfinal.nvidiaPackages;
+            } // args);
+          in {
+            nvidia-patch = callPackage { };
+            nvidia-patches = nixlib.mapAttrs (_: nvidia_x11: nvidia_x11.patch) (nixlib.filterAttrs (_: nixlib.isDerivation) kfinal.nvidiaPackages);
+            nvidiaPackages = kprev.nvidiaPackages.extend (nfinal: nprev: nixlib.mapAttrs (name: nvidia_x11: let
+              drv = nvidia_x11 // {
+                patch = callPackage {
+                  inherit nvidia_x11;
+                };
+              };
+            in if nixlib.isDerivation nvidia_x11 then drv else nvidia_x11) nprev);
           });
         };
       };
       default = self.overlays.nvidia-patch;
+    };
+    nixosModules = {
+      nvidia-patch = { lib, ... }: {
+        imports = [ ./nixos.nix ];
+        config = {
+          _module.args.inputs'nvidia-patch = lib.mkDefault self;
+        };
+      };
+      default = self.nixosModules.nvidia-patch;
     };
     config = rec {
       name = "nvidia-patch";
