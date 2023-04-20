@@ -12,10 +12,9 @@ in {
   config = {
     name = "nvidia-patch";
     system = "x86_64-linux";
+    ci.version = "v0.6";
     ci.gh-actions.enable = true;
-    channels = {
-      nixpkgs.args.config.allowUnfree = true;
-    };
+    channels.nixpkgs.args.config.allowUnfree = true;
     tasks = {
       build.inputs = singleton build;
       version-supported.inputs = singleton checks.supported;

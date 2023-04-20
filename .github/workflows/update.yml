@@ -1,16 +1,17 @@
 env:
   CI_ALLOW_ROOT: '1'
-  CI_CONFIG: ./ci.nix
+  CI_CONFIG: ./ci-update.nix
   CI_PLATFORM: gh-actions
 jobs:
   ci:
-    name: nvidia-patch
+    name: update
     runs-on: ubuntu-latest
     steps:
     - id: checkout
       name: git clone
       uses: actions/checkout@v3
       with:
+        fetch-depth: 0
         submodules: true
     - id: nix-install
       name: nix install
@@ -55,13 +56,14 @@ jobs:
         quiet: false
         stdin: ${{ runner.temp }}/ci.build.cache
   ci-check:
-    name: nvidia-patch check
+    name: update check
     runs-on: ubuntu-latest
     steps:
     - id: checkout
       name: git clone
       uses: actions/checkout@v3
       with:
+        fetch-depth: 0
         submodules: true
     - id: nix-install
       name: nix install
@@ -76,10 +78,22 @@ jobs:
       name: gh-actions compare
       uses: arcnmx/ci/actions/nix/run@v0.6
       with:
-        args: -u .github/workflows/nvidia-patch.yml .ci/workflow.yml
+        args: -u .github/workflows/update.yml .ci/workflow.yml
         attrs: nixpkgs.diffutils
         command: diff
-name: nvidia-patch
+name: update
 'on':
-- push
-- pull_request
+  pull_request:
+    paths:
+    - .github/workflows/update.yml
+    - flake.nix
+    - ci.nix
+    - derivation.nix
+  push:
+    paths:
+    - .github/workflows/update.yml
+    - flake.nix
+    - ci.nix
+    - derivation.nix
+  schedule:
+  - cron: 40 8 * * *
