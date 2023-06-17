@@ -52,11 +52,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1685844060,
-        "narHash": "sha256-C9fMAbIJPQnnkJgVMCpZuAv3vIZP4kgWKSGYYCC5G9M=",
+        "lastModified": 1686953075,
+        "narHash": "sha256-wuyQEsKKW38bYzmkH51jrs9k+VtE0iWNLIyCUYapFDk=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "90385792c887f63cc473c764f801be7a3f3894b6",
+        "rev": "a199713f336d12f8bbc37cdf72a46e08b5cb4797",
         "type": "github"
       },
       "original": {
@@ -67,11 +67,11 @@
     "nvidia-patch-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1685806938,
-        "narHash": "sha256-Cr7tTSj3LR3FEBgZ15IEOBa1ogqXDGYPfASc7uDfBnM=",
+        "lastModified": 1686945302,
+        "narHash": "sha256-AS/+0EPO8ClO/FfxSTFLQIxxctqOznFivwoEqTmEC8Y=",
         "owner": "keylase",
         "repo": "nvidia-patch",
-        "rev": "3358c5d92e61d42c1557432e82ccda445d3fa082",
+        "rev": "63a77cc0e58f1f544f16fb4496b8aeca84d8010e",
         "type": "github"
       },
       "original": {
