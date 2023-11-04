@@ -1,6 +1,6 @@
 { nvidia-patch-src
 , nvidia-patch-drivers
-, stdenvNoCC, fetchFromGitHub, fetchpatch, writeShellScriptBin
+, stdenvNoCC, writeShellScriptBin
 , lib
 , lndir
 , nvidia_x11 ? linuxPackages.nvidia_x11, linuxPackages ? { }
@@ -13,8 +13,23 @@
     set -- -sl
     source $patchScript
 
-    patch="''${patch_list[$nvidiaVersion]-}"
-    object="''${object_list[$nvidiaVersion]-}"
+    patch=
+    if [[ -v patch_list["$nvidiaVersion"] ]]; then
+      patch="''${patch_list["$nvidiaVersion"]}"
+    fi
+
+    object=
+    if [[ -v object_list["$nvidiaVersion"] ]]; then
+      object="''${object_list["$nvidiaVersion"]}"
+    fi
+
+    if [[ -z $object ]]; then
+      if [[ $patchScript = *patch.sh ]]; then
+        object="libnvidia-encode${stdenvNoCC.hostPlatform.extensions.sharedLibrary}"
+      elif [[ $patchScript = *patch-fbc.sh ]]; then
+        object="libnvidia-fbc${stdenvNoCC.hostPlatform.extensions.sharedLibrary}"
+      fi
+    fi
 
     if [[ -z $patch || -z $object ]]; then
       echo "$nvidiaVersion not supported for $patchScript" >&2
