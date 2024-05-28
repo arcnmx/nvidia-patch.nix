@@ -43,6 +43,7 @@
     nvfbc_patch = false;
   };
   nvidiaVersion = nvidia_x11.version;
+  hasFirmware = lib.elem "firmware" nvidia_x11.outputs;
 in stdenvNoCC.mkDerivation {
   pname = "nvidia-x11";
   version = nvidiaVersion + "+patch" + nvidia-patch-src.version or nvidia-patch-src.lastModifiedDate or "";
@@ -57,9 +58,11 @@ in stdenvNoCC.mkDerivation {
   inherit nvidiaVersion nvidia_x11;
   nvidia_x11_bin = nvidia_x11.bin;
   nvidia_x11_lib32 = nvidia_x11.lib32; # XXX: no patches for 32bit?
+  ${if hasFirmware then "nvidia_x11_firmware" else null} = nvidia_x11.firmware;
   inherit (driver) nvenc_patch nvfbc_patch;
 
-  outputs = [ "out" "bin" "lib32" ];
+  outputs = [ "out" "bin" "lib32" ]
+    ++ lib.optional hasFirmware "firmware";
 
   buildPhase = ''
     runHook preBuild
@@ -90,6 +93,11 @@ in stdenvNoCC.mkDerivation {
     ln -s $nvidia_x11_bin/* $bin/
     ln -s $nvidia_x11_lib32/* $lib32/
 
+    if [[ -n ''${firmware-} ]]; then
+      install -d $firmware
+      ln -s $nvidia_x11_firmware/* $firmware/
+    fi
+
     runHook postInstall
   '';
 
@@ -101,5 +109,6 @@ in stdenvNoCC.mkDerivation {
     inherit driver;
     ci.cache.wrap = true;
     inherit (nvidia_x11) useProfiles persistenced settings bin lib32;
+    ${if hasFirmware then "firmware" else null} = nvidia_x11.firmware;
   };
 }
