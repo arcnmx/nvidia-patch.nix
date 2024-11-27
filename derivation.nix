@@ -64,6 +64,16 @@ in stdenvNoCC.mkDerivation {
   outputs = [ "out" "bin" "lib32" ]
     ++ lib.optional hasFirmware "firmware";
 
+  nvidiaPatchRootPattern = ''\[ "\$(id.* -ne 0 \]'';
+  postPatch = ''
+    sed -i patch.sh \
+      -e "s/$nvidiaPatchRootPattern/false/"
+    if [[ -e patch-fbc.sh ]]; then
+      sed -i patch-fbc.sh \
+        -e "s/$nvidiaPatchRootPattern/false/"
+    fi
+  '';
+
   buildPhase = ''
     runHook preBuild
     if [[ -n $nvenc_patch ]]; then
