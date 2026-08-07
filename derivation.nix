@@ -118,7 +118,7 @@ in stdenvNoCC.mkDerivation {
   passthru = rec {
     inherit driver;
     ci.cache.wrap = true;
-    inherit (nvidia_x11) useProfiles persistenced settings bin lib32;
+    inherit (nvidia_x11) useProfiles persistenced settings bin lib32 mod open;
     ${if hasFirmware then "firmware" else null} = nvidia_x11.firmware;
   };
 }
