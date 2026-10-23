@@ -66,11 +66,11 @@
     "nvidia-patch-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1792643472,
-        "narHash": "sha256-LYdlKRuFlRfcYp00p57x65vCjki6Hc5Ir+8Qni1bH0A=",
+        "lastModified": 1792719950,
+        "narHash": "sha256-RUhAFqgK3ngXmYIcPg4pem9Iy0eKSQupMty2aQuU02s=",
         "owner": "keylase",
         "repo": "nvidia-patch",
-        "rev": "17550655980a476afc820f0cd572763469e82443",
+        "rev": "9b487a584ab02fd87ee1955ff9ae09522e452fd0",
         "type": "github"
       },
       "original": {
