@@ -52,11 +52,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1793795574,
-        "narHash": "sha256-ey4jOibbc003QnvG+D7j8S5w2m33vf0S800hWUMoDOI=",
-        "rev": "13e53762c5afaf384d4614e94527a9ccfafe41d0",
+        "lastModified": 1793977579,
+        "narHash": "sha256-4/Yzr1fWTh/zBAR1tR84ZQ1Zhmor8AXwgD4AS7sPn60=",
+        "rev": "4fe25e12eb9f4c744966dd3de5a05246cf098601",
         "type": "tarball",
-        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1108269.13e53762c5af/nixexprs.tar.zst"
+        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1109744.4fe25e12eb9f/nixexprs.tar.zst"
       },
       "original": {
         "id": "nixpkgs",
@@ -66,11 +66,11 @@
     "nvidia-patch-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1793837183,
-        "narHash": "sha256-78oNxCCgw4zRKIaMkT/4pQz9hQfyUX0YIKJQhShrXTA=",
+        "lastModified": 1794138128,
+        "narHash": "sha256-tZAXQQ+9C94wV/1FVx+lVDDtJm/buphdhysJlw5GSrA=",
         "owner": "keylase",
         "repo": "nvidia-patch",
-        "rev": "809fa4add10a0ab44f872096c0d787275e210cb4",
+        "rev": "620c4aa29cbff9ea32a0b1e29dad60eb62b9dba5",
         "type": "github"
       },
       "original": {
